@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ttbt.smartclass.mapper.UserDailyWordMapper">
+
+    <resultMap id="BaseResultMap" type="com.ttbt.smartclass.model.entity.UserDailyWord">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="wordId" column="word_id" />
+        <result property="isStudied" column="is_studied" />
+        <result property="studyTime" column="study_time" />
+        <result property="isLiked" column="is_liked" />
+        <result property="likeTime" column="like_time" />
+        <result property="noteContent" column="note_content" />
+        <result property="noteTime" column="note_time" />
+        <result property="masteryLevel" column="mastery_level" />
+        <result property="isWrong" column="is_wrong" />
+        <result property="wrongTime" column="wrong_time" />
+        <result property="reviewTime" column="review_time" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,word_id,is_studied,study_time,is_liked,like_time,
+        note_content,note_time,mastery_level,is_wrong,wrong_time,
+        review_time,create_time,update_time
+    </sql>
+
+    <select id="listThumbWordByPage" resultType="com.ttbt.smartclass.model.entity.DailyWord">
+        select w.*
+        from daily_word w
+        join user_daily_word udw on w.id = udw.word_id
+        where udw.user_id = #{thumbUserId}
+        and udw.is_liked = 1
+        and w.is_delete = 0
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

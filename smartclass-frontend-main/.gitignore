@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist.zip
+build/
+
+# Runtime / logs
+logs/
+*.log
+*.log.*
+
+# Env
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+.cursor/
+.history/
+
+# Android / Gradle cache
+android/.gradle/
+android/**/build/
+
+# Tool cache
+.cache/
+.eslintcache
+android/app/release/
+android/app/src/main/assets/public/

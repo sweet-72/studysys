@@ -1,0 +1,2 @@
+<!-- 这是一个占位文件，请将实际的头像图片保存为  或 avatar-default.jpg -->
+<!-- 位置：public/avatar-default.png -->

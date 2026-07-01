@@ -1,0 +1,73 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.history/
+
+# Logs
+*.log
+*.log.*
+logs/
+
+# Java / Maven
+target/
+out/
+*.class
+*.jar
+*.war
+*.ear
+dependency-reduced-pom.xml
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+.eslintcache
+.umi/
+.umi-production/
+.umi-test/
+
+# Android / Gradle cache
+.gradle/
+android/.gradle/
+**/android/.gradle/
+**/android/**/build/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+!.env.example
+
+# Spring Boot real configs
+learning-system/src/main/resources/application.yml
+learning-system/src/main/resources/application-dev.yml
+learning-system/src/main/resources/application-test.yml
+learning-system/src/main/resources/application-prod.yml
+!learning-system/src/main/resources/application-example.yml
+
+# Runtime upload files
+learning-system/upload/**
+!learning-system/upload/
+!learning-system/upload/.gitkeep
+!learning-system/upload/course_video/
+!learning-system/upload/course_video/.gitkeep
+!learning-system/upload/user_avatar/
+!learning-system/upload/user_avatar/.gitkeep
+
+# Temp files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+**/android/**/release/
+**/android/app/src/main/assets/public/

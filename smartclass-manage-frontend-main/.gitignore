@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Umi cache
+.umi/
+.umi-production/
+.umi-test/
+src/.umi/
+src/.umi-production/
+
+# Runtime / logs
+logs/
+*.log
+*.log.*
+
+# Env
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+.history/
+
+# Tool cache
+.cache/
+.eslintcache
+_roadhog-api-doc/
+src/utils/request-temp.js
+screenshot/
+.firebase/
+functions/
+.temp/
+
+# Temp
+*.tmp
+*.temp
+*.bak
+*.swp

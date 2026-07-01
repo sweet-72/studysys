@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ttbt.smartclass.mapper.PostMapper">
+
+    <resultMap id="BaseResultMap" type="com.ttbt.smartclass.model.entity.Post">
+            <id property="id" column="id" />
+            <result property="title" column="title" />
+            <result property="content" column="content" />
+            <result property="tags" column="tags" />
+            <result property="thumbNum" column="thumb_num" />
+            <result property="favourNum" column="favour_num" />
+            <result property="userId" column="user_id" />
+            <result property="country" column="country" />
+            <result property="city" column="city" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+            <result property="isDelete" column="is_delete" />
+            <result property="type" column="type" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,content,tags,thumb_num,favour_num,
+        user_id,country,city,create_time,update_time,
+        is_delete,type
+    </sql>
+    
+    <!-- 查询帖子列表（包括已被删除的数据） -->
+    <select id="listPostWithDelete" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM post
+        WHERE update_time >= #{minUpdateTime}
+    </select>
+</mapper>

@@ -1,0 +1,119 @@
+# ===========================
+# SmartClass 示例配置文件
+# 复制本文件为 application.yml 后，根据实际环境修改
+# ===========================
+
+spring:
+    application:
+        name: smart-class
+
+    profiles:
+        active: test
+
+    mvc:
+        pathmatch:
+            matching-strategy: ant_path_matcher
+
+    session:
+        store-type: redis
+        timeout: 2592000
+
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/smart_class
+        username: your_username
+        password: your_password
+
+    redis:
+        database: 1
+        host: localhost
+        port: 6379
+        timeout: 5000
+        password:
+
+    elasticsearch:
+        uris: http://localhost:9200
+        username:
+        password:
+
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB
+
+server:
+    address: 0.0.0.0
+    port: 8101
+    servlet:
+        context-path: /api
+        session:
+            cookie:
+                max-age: 2592000
+
+mybatis-plus:
+    configuration:
+        map-underscore-to-camel-case: true
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+wx:
+    mp:
+        token: your_token
+        aesKey: your_aes_key
+        appId: your_app_id
+        secret: your_app_secret
+        config-storage:
+            http-client-type: HttpClient
+            key-prefix: wx
+            redis:
+                host: localhost
+                port: 6379
+            type: Memory
+
+    open:
+        appId: your_open_appid
+        appSecret: your_open_secret
+
+cos:
+    client:
+        accessKey: your_access_key
+        secretKey: your_secret_key
+        region: your_region
+        bucket: your_bucket
+
+        upload:
+            max-avatar-size: 2
+            max-video-size: 100
+            max-document-size: 20
+            max-material-size: 50
+
+            allowed-video-types: mp4,avi,mov,flv,wmv
+            allowed-document-types: pdf,doc,docx,ppt,pptx,xls,xlsx,txt
+            allowed-material-types: pdf,doc,docx,ppt,pptx,xls,xlsx,txt,zip,rar,7z
+
+knife4j:
+    enable: true
+    openapi:
+        title: 接口文档
+        version: 1.0
+        group:
+            default:
+                api-rule: package
+                api-rule-resources:
+                    - com.ttbt.smartclass.controller
+
+dify:
+    base-url: http://localhost:8091/v1
+    chat-messages-path: /chat-messages
+    user-prefix: aiedu_user_
+    enable-streaming-verbose-log: false
+
+netty:
+    websocket:
+        port: 12346
+        heartbeat-timeout: 60
+        auth-timeout: 10
+        max-connections: 10000
+
+logging:
+    level:
+        com.ttbt.smartclass: debug

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ttbt.smartclass.mapper.UserAiAvatarMapper">
+
+    <resultMap id="BaseResultMap" type="com.ttbt.smartclass.model.entity.UserAiAvatar">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="aiAvatarId" column="ai_avatar_id" />
+        <result property="isFavorite" column="is_favorite" />
+        <result property="lastUseTime" column="last_use_time" />
+        <result property="useCount" column="use_count" />
+        <result property="userRating" column="user_rating" />
+        <result property="userFeedback" column="user_feedback" />
+        <result property="customSettings" column="custom_settings" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, ai_avatar_id, is_favorite, last_use_time, use_count,
+        user_rating, user_feedback, custom_settings, create_time, update_time
+    </sql>
+</mapper>

@@ -1,0 +1,48 @@
+# Maven
+target/
+out/
+*.class
+*.jar
+*.war
+*.ear
+dependency-reduced-pom.xml
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Real Spring Boot configs
+src/main/resources/application.yml
+src/main/resources/application-dev.yml
+src/main/resources/application-test.yml
+src/main/resources/application-prod.yml
+!src/main/resources/application-example.yml
+
+# Runtime uploads
+upload/**
+!upload/
+!upload/.gitkeep
+!upload/course_video/
+!upload/course_video/.gitkeep
+!upload/user_avatar/
+!upload/user_avatar/.gitkeep
+
+# Env and temp
+.env
+.env.*
+!.env.example
+*.tmp
+*.temp
+*.bak
+*.swp

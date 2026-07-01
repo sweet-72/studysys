@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ttbt.smartclass.mapper.UserDailyArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.ttbt.smartclass.model.entity.UserDailyArticle">
+            <id property="id" column="id" />
+            <result property="userId" column="user_id" />
+            <result property="articleId" column="article_id" />
+            <result property="isRead" column="is_read" />
+            <result property="readTime" column="read_time" />
+            <result property="isLiked" column="is_liked" />
+            <result property="likeTime" column="like_time" />
+            <result property="isCollected" column="is_collected" />
+            <result property="collectTime" column="collect_time" />
+            <result property="commentContent" column="comment_content" />
+            <result property="commentTime" column="comment_time" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,article_id,is_read,read_time,is_liked,
+        like_time,is_collected,collect_time,comment_content,comment_time,
+        create_time,update_time
+    </sql>
+    
+    <!-- 获取用户收藏的文章列表 -->
+    <select id="listFavourArticleByPage" resultType="com.ttbt.smartclass.model.entity.DailyArticle">
+        select a.*
+        from daily_article a
+        join user_daily_article uda on a.id = uda.article_id
+        where uda.user_id = #{favourUserId}
+        and uda.is_collected = 1
+        and a.is_delete = 0
+        ${ew.customSqlSegment}
+    </select>
+    
+    <!-- 获取用户点赞的文章列表 -->
+    <select id="listThumbArticleByPage" resultType="com.ttbt.smartclass.model.entity.DailyArticle">
+        select a.*
+        from daily_article a
+        join user_daily_article uda on a.id = uda.article_id
+        where uda.user_id = #{thumbUserId}
+        and uda.is_liked = 1
+        and a.is_delete = 0
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

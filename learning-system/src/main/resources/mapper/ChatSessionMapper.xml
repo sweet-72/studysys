@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ttbt.smartclass.mapper.ChatSessionMapper">
+
+    <resultMap id="BaseResultMap" type="com.ttbt.smartclass.model.entity.ChatSession">
+            <id property="id" column="id" />
+            <result property="sessionId" column="session_id" />
+            <result property="user1Id" column="user1_id" />
+            <result property="user2Id" column="user2_id" />
+            <result property="lastMessageId" column="last_message_id" />
+            <result property="lastMessageContent" column="last_message_content" />
+            <result property="lastMessageType" column="last_message_type" />
+            <result property="lastMessageTime" column="last_message_time" />
+            <result property="user1UnreadCount" column="user1_unread_count" />
+            <result property="user2UnreadCount" column="user2_unread_count" />
+            <result property="isUser1Deleted" column="is_user1_deleted" />
+            <result property="isUser2Deleted" column="is_user2_deleted" />
+            <result property="isUser1Top" column="is_user1_top" />
+            <result property="isUser2Top" column="is_user2_top" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+            <result property="isDelete" column="is_delete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, session_id, user1_id, user2_id,
+        last_message_id, last_message_content, last_message_type, last_message_time,
+        user1_unread_count, user2_unread_count,
+        is_user1_deleted, is_user2_deleted,
+        is_user1_top, is_user2_top,
+        create_time, update_time, is_delete
+    </sql>
+
+    <!-- 根据 SessionID 查询会话 -->
+    <select id="selectBySessionId" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM chat_session
+        WHERE session_id = #{sessionId} AND is_delete = 0
+    </select>
+
+</mapper>

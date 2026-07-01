@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ttbt.smartclass.mapper.PrivateChatSessionMapper">
+
+    <resultMap id="BaseResultMap" type="com.ttbt.smartclass.model.entity.PrivateChatSession">
+            <id property="id" column="id" />
+            <result property="userId1" column="user_id1" />
+            <result property="userId2" column="user_id2" />
+            <result property="lastMessageTime" column="last_message_time" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+            <result property="isDelete" column="is_delete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id1,user_id2,last_message_time,create_time,update_time,
+        is_delete
+    </sql>
+</mapper>

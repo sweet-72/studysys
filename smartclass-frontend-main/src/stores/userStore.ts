@@ -94,10 +94,7 @@ const syncToken = (payload?: unknown, headers?: Headers) => {
 
   if (token) {
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
-    return;
   }
-
-  localStorage.removeItem(TOKEN_STORAGE_KEY);
 };
 
 export const useUserStore = defineStore('user', () => {
@@ -159,7 +156,6 @@ export const useUserStore = defineStore('user', () => {
       if (response.code === 0 && response.data) {
         const normalizedUser = normalizeUserInfo(response.data);
         setCurrentUser(normalizedUser);
-        syncToken(response, undefined);
         return normalizedUser;
       }
       return userInfo.value;
@@ -179,7 +175,6 @@ export const useUserStore = defineStore('user', () => {
 
       if (response.code === 0 && response.data) {
         const normalizedUser = normalizeUserInfo(response.data);
-        syncToken(response);
         syncToken(response.data as LoginPayload);
         setCurrentUser(normalizedUser);
         return { success: true, data: normalizedUser };
@@ -208,7 +203,6 @@ export const useUserStore = defineStore('user', () => {
 
       if (response.code === 0 && response.data) {
         const normalizedUser = normalizeUserInfo(response.data);
-        syncToken(response);
         syncToken(response.data as LoginPayload);
         setCurrentUser(normalizedUser);
         return { success: true, data: normalizedUser };

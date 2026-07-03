@@ -123,12 +123,10 @@ const onSubmit = async () => {
       showToast({
         type: 'success',
         message: '登录成功',
-        onClose: () => {
-          // 获取重定向URL
-          const redirectUrl = router.currentRoute.value.query.redirect || '/';
-          router.push(redirectUrl.toString());
-        },
       });
+      // 获取重定向URL
+      const redirectUrl = router.currentRoute.value.query.redirect || '/';
+      await router.replace(redirectUrl.toString());
     } else {
       showToast({
         type: 'fail',

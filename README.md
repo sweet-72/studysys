@@ -28,7 +28,7 @@ cd learning-system
 copy src\main\resources\application-example.yml src\main\resources\application.yml
 ```
 
-Edit `application.yml`, then initialize MySQL:
+Edit the generated `application.yml`, then initialize MySQL. Spring Boot loads `application.yml` by default; this project does not require `application-dev.yml`, `application-test.yml`, `application-prod.yml`, or any active profile for local startup.
 
 ```bash
 mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS smart_class DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"

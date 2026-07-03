@@ -46,7 +46,9 @@ learning-system/
 copy src\main\resources\application-example.yml src\main\resources\application.yml
 ```
 
-Edit `application.yml` and configure MySQL, Redis, Elasticsearch, Dify, COS, and WeChat settings as needed.
+Edit the generated `application.yml` and configure MySQL, Redis, Elasticsearch, Dify, COS, and WeChat settings as needed.
+
+Spring Boot loads `application.yml` by default. The public repository only keeps `application-example.yml`; do not rely on `application-dev.yml`, `application-test.yml`, `application-prod.yml`, or any active profile for local startup.
 
 ### 2. Initialize Database
 

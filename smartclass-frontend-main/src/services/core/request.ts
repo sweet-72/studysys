@@ -16,6 +16,7 @@ import type { OpenAPIConfig } from './OpenAPI';
 const TOKEN_STORAGE_KEY = 'token';
 const USER_INFO_STORAGE_KEY = 'userInfo';
 const LOGIN_PATH = '/login';
+const PUBLIC_AUTH_PATHS = ['/login', '/register'];
 
 export const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => {
     return value !== undefined && value !== null;
@@ -71,11 +72,13 @@ const redirectToLogin = () => {
         return;
     }
 
+    if (PUBLIC_AUTH_PATHS.includes(window.location.pathname)) {
+        return;
+    }
+
     const redirect = encodeURIComponent(`${window.location.pathname}${window.location.search}${window.location.hash}`);
     const nextUrl = `${LOGIN_PATH}?redirect=${redirect}`;
-    if (window.location.pathname !== LOGIN_PATH) {
-        window.location.href = nextUrl;
-    }
+    window.location.href = nextUrl;
 };
 
 const handleAuthExpired = () => {
@@ -99,12 +102,43 @@ const pickHeaderValue = (headers: AxiosResponse['headers'], names: string[]): st
     return '';
 };
 
+const pickTokenValue = (source: any): string => {
+    if (!source || typeof source !== 'object') {
+        return '';
+    }
+
+    const directCandidates = [
+        source.token,
+        source.accessToken,
+        source.jwtToken,
+        source.authToken,
+        source.authorization,
+        source.Authorization,
+    ];
+
+    for (const item of directCandidates) {
+        if (isStringWithValue(item)) {
+            return item.replace(/^Bearer\s+/i, '').trim();
+        }
+    }
+
+    const nestedCandidates = [source.data, source.tokenInfo, source.auth, source.extra, source.meta];
+    for (const item of nestedCandidates) {
+        const nestedToken = pickTokenValue(item);
+        if (nestedToken) {
+            return nestedToken;
+        }
+    }
+
+    return '';
+};
+
 const syncTokenFromResponse = (response: AxiosResponse<any>) => {
     if (typeof localStorage === 'undefined') {
         return;
     }
 
-    const token = pickHeaderValue(response.headers, [
+    const tokenFromHeader = pickHeaderValue(response.headers, [
         'authorization',
         'Authorization',
         'x-access-token',
@@ -112,9 +146,10 @@ const syncTokenFromResponse = (response: AxiosResponse<any>) => {
         'token',
         'Token',
     ]);
+    const token = tokenFromHeader.replace(/^Bearer\s+/i, '').trim() || pickTokenValue(response.data);
 
     if (token) {
-        localStorage.setItem(TOKEN_STORAGE_KEY, token.replace(/^Bearer\s+/i, '').trim());
+        localStorage.setItem(TOKEN_STORAGE_KEY, token);
     }
 };
 
@@ -333,7 +368,18 @@ export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): 
         ...options.errors,
     }
 
-    const error = errors[result.status];
+    const responseMessage = result.body && typeof result.body === 'object'
+        ? (result.body as Record<string, any>).message
+        : undefined;
+
+    if (result.ok && result.body && typeof result.body === 'object') {
+        const businessCode = (result.body as Record<string, any>).code;
+        if (businessCode !== undefined && businessCode !== 0 && businessCode !== '0') {
+            throw new ApiError(options, result, responseMessage || '请求失败');
+        }
+    }
+
+    const error = result.ok ? errors[result.status] : responseMessage || errors[result.status];
     if (error) {
         throw new ApiError(options, result, error);
     }

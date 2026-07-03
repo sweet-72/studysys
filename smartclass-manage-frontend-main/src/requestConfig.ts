@@ -48,16 +48,16 @@ export const requestConfig: RequestConfig = {
         const isLoginPage = window.location.pathname.includes(loginPath);
         if (!isLoginCheck && !isLoginPage) {
           redirectToLogin();
-          throw new Error('ÇëÏÈµÇÂ¼');
+          throw new Error('è¯·å…ˆç™»å½•');
         }
       }
 
       if (!payload) {
-        throw new Error('·şÎñÒì³££¬ÇëÉÔºóÖØÊÔ');
+        throw new Error('æœåŠ¡å¼‚å¸¸ï¼Œè¯·ç¨åé‡è¯•');
       }
 
       if (Number(payload.code) !== 0) {
-        throw new Error(payload.message || '·şÎñÆ÷´íÎó');
+        throw new Error(payload.message || 'è¯·æ±‚å¤±è´¥');
       }
 
       return response;
@@ -69,7 +69,11 @@ export const requestConfig: RequestConfig = {
       const code = Number(error?.response?.data?.code);
       if (isUnauthorizedResponse(status, code)) {
         redirectToLogin();
-        throw new Error('ÇëÏÈµÇÂ¼');
+        throw new Error('è¯·å…ˆç™»å½•');
+      }
+      const backendMessage = error?.response?.data?.message;
+      if (backendMessage) {
+        throw new Error(backendMessage);
       }
       throw error;
     },

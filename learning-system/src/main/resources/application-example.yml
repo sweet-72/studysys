@@ -1,14 +1,12 @@
 # ===========================
-# SmartClass 示例配置文件
-# 复制本文件为 application.yml 后，根据实际环境修改
+# SmartClass example configuration
+# Copy this file to application.yml, then edit values for your local environment.
+# Spring Boot loads application.yml by default. This template does not require a profile.
 # ===========================
 
 spring:
     application:
         name: smart-class
-
-    profiles:
-        active: test
 
     mvc:
         pathmatch:

@@ -1,6 +1,5 @@
 package com.ttbt.smartclass.service.impl;
 
-import static com.ttbt.smartclass.constant.UserConstant.SALT;
 import static com.ttbt.smartclass.constant.UserConstant.USER_LOGIN_STATE;
 
 import cn.hutool.core.collection.CollUtil;
@@ -32,9 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
 
 @Service
 @Slf4j
@@ -53,6 +52,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private static final String COLUMN_IS_DELETE = "is_delete";
     private static final String LOGIN_USER_ID_SESSION_KEY = "LOGIN_USER_ID";
     private static final String SPRING_SECURITY_CONTEXT_KEY = "SPRING_SECURITY_CONTEXT";
+    private static final String USER_ACCOUNT_PATTERN = "^[A-Za-z0-9_]+$";
 
     private final Map<String, Object> registerLockMap = new ConcurrentHashMap<>();
     private final Map<String, Object> phoneRegisterLockMap = new ConcurrentHashMap<>();
@@ -60,6 +60,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private JwtTokenManager jwtTokenManager;
+
+    @Resource
+    private BCryptPasswordEncoder passwordEncoder;
 
     /**
      * 使用账号和密码注册普通用户。
@@ -81,14 +84,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             try {
                 // 查询账号是否已存在，存在则拒绝重复注册
                 if (existsByAccount(userAccount)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+                    throw new BusinessException(ErrorCode.PARAMS_ERROR, "该用户名已存在");
                 }
 
                 // 创建普通用户并保存加密后的密码
                 User user = new User();
                 user.setUserAccount(userAccount);
                 user.setUserName(userAccount);
-                user.setUserPassword(encryptPassword(userPassword));
+                user.setUserPassword(passwordEncoder.encode(userPassword));
                 user.setUserRole(UserRoleEnum.USER.getValue());
                 boolean saveResult = this.save(user);
                 if (!saveResult) {
@@ -131,7 +134,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 user.setUserAccount(userAccount);
                 user.setUserName(buildPhoneDisplayName(userPhone));
                 user.setUserPhone(userPhone);
-                user.setUserPassword(encryptPassword(userPassword));
+                user.setUserPassword(passwordEncoder.encode(userPassword));
                 user.setUserRole(UserRoleEnum.USER.getValue());
                 boolean saveResult = this.save(user);
                 if (!saveResult) {
@@ -463,32 +466,53 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private void validateAccountRegister(String userAccount, String userPassword, String checkPassword) {
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+        if (StringUtils.isBlank(userAccount)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名不能为空");
         }
         if (userAccount.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名长度不能少于4位");
         }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+        if (!userAccount.matches(USER_ACCOUNT_PATTERN)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名只能包含字母、数字和下划线");
+        }
+        if (StringUtils.isBlank(userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码不能为空");
+        }
+        if (userPassword.length() < 8) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码长度不能少于8位");
+        }
+        if (StringUtils.isBlank(checkPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "确认密码不能为空");
+        }
+        if (checkPassword.length() < 8) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "确认密码长度不能少于8位");
         }
         if (!userPassword.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
         }
     }
 
     private void validatePhoneRegister(String userPhone, String userPassword, String checkPassword) {
-        if (StringUtils.isAnyBlank(userPhone, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+        if (StringUtils.isBlank(userPhone)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号不能为空");
         }
         if (!userPhone.matches("^1[3-9]\\d{9}$")) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号格式不正确");
         }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+        if (StringUtils.isBlank(userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码不能为空");
+        }
+        if (userPassword.length() < 8) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码长度不能少于8位");
+        }
+        if (StringUtils.isBlank(checkPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "确认密码不能为空");
+        }
+        if (checkPassword.length() < 8) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "确认密码长度不能少于8位");
         }
         if (!userPassword.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
         }
     }
 
@@ -535,10 +559,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return "新用户";
     }
 
-    private String encryptPassword(String userPassword) {
-        return DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-    }
-
     private void saveLoginState(HttpServletRequest request, User user) {
         if (request == null || user == null) {
             return;
@@ -547,6 +567,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (userId == null) {
             return;
         }
+        request.setAttribute(USER_LOGIN_STATE, user);
+        request.setAttribute(LOGIN_USER_ID_SESSION_KEY, userId);
         request.getSession().setAttribute(USER_LOGIN_STATE, userId);
         request.getSession().setAttribute(LOGIN_USER_ID_SESSION_KEY, userId);
     }
@@ -631,6 +653,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
             return null;
         }
+        if (sessionValue instanceof User) {
+            return resolveSessionUserId(((User) sessionValue).getId());
+        }
         if (sessionValue instanceof Map) {
             Object idObj = ((Map<?, ?>) sessionValue).get("id");
             if (idObj == null) {
@@ -659,21 +684,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private void verifyPassword(User user, String rawPassword, String identityType, String identityValue) {
-        String encryptedInput = encryptPassword(rawPassword);
         String dbPassword = user.getUserPassword();
         if (StringUtils.isBlank(dbPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
         }
 
-        boolean passwordMatched = encryptedInput.equals(dbPassword);
-        if (!passwordMatched) {
-            boolean looksLikeLegacyPlainText = dbPassword.length() != 32 || !dbPassword.matches("[a-f0-9]{32}");
-            if (looksLikeLegacyPlainText) {
-                passwordMatched = rawPassword.equals(dbPassword);
-            }
-        }
-
-        if (!passwordMatched) {
+        if (!passwordEncoder.matches(rawPassword, dbPassword)) {
             log.info("user login failed, password mismatch for {}: {}", identityType, identityValue);
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
         }

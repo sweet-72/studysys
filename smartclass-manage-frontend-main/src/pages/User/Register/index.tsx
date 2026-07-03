@@ -9,6 +9,15 @@ import React, { useState } from 'react';
 import { Link } from 'umi';
 import Settings from '../../../../config/defaultSettings';
 
+const getRegisterErrorMessage = (error: any) => {
+  return (
+    error?.response?.data?.message ||
+    error?.data?.message ||
+    error?.message ||
+    '系统错误'
+  );
+};
+
 const UserRegisterPage: React.FC = () => {
   const [type, setType] = useState<string>('account');
   const containerClassName = useEmotionCss(() => ({
@@ -35,7 +44,7 @@ const UserRegisterPage: React.FC = () => {
       message.success('注册成功！');
       history.push('/user/login');
     } catch (error: any) {
-      message.error(error.message || '系统错误');
+      message.error(getRegisterErrorMessage(error));
     }
   };
 

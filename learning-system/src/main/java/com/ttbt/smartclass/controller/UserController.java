@@ -1,7 +1,5 @@
 package com.ttbt.smartclass.controller;
 
-import static com.ttbt.smartclass.constant.UserConstant.SALT;
-
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,7 +37,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseCookie;
-import org.springframework.util.DigestUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +59,9 @@ public class UserController {
     @Resource
     private WxOpenConfig wxOpenConfig;
 
+    @Resource
+    private BCryptPasswordEncoder passwordEncoder;
+
     // region 认证相关接口
 
     /**
@@ -69,14 +70,11 @@ public class UserController {
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "注册信息不能为空");
         }
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);
     }
@@ -87,14 +85,11 @@ public class UserController {
     @PostMapping("/register/phone")
     public BaseResponse<Long> userRegisterByPhone(@RequestBody UserRegisterByPhoneRequest userRegisterByPhoneRequest) {
         if (userRegisterByPhoneRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号注册信息不能为空");
         }
         String userPhone = userRegisterByPhoneRequest.getUserPhone();
         String userPassword = userRegisterByPhoneRequest.getUserPassword();
         String checkPassword = userRegisterByPhoneRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userPhone, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
         long result = userService.userRegisterByPhone(userPhone, userPassword, checkPassword);
         return ResultUtils.success(result);
     }
@@ -202,8 +197,7 @@ public class UserController {
 
         // 管理端新增用户时分配默认初始密码。
         String defaultPassword = "12345678";
-        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + defaultPassword).getBytes());
-        user.setUserPassword(encryptPassword);
+        user.setUserPassword(passwordEncoder.encode(defaultPassword));
 
         boolean result = userService.save(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -407,6 +401,8 @@ public class UserController {
                 .sameSite("Lax")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
+        response.setHeader("Authorization", "Bearer " + loginUserVO.getToken());
+        response.setHeader("token", loginUserVO.getToken());
     }
 
     private void clearLoginTokenCookie(HttpServletResponse response, HttpServletRequest request) {

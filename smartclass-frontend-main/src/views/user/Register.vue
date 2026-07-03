@@ -106,20 +106,50 @@ const formData = ref({
   confirmPassword: '',
 });
 
+const getRegisterErrorMessage = (error) => {
+  return (
+    error?.body?.message ||
+    error?.response?.data?.message ||
+    error?.data?.message ||
+    error?.message ||
+    '注册失败，请检查网络连接'
+  );
+};
+
 const validateForm = () => {
   // 表单验证
-  if (registerType.value === 'account' && !formData.value.userAccount) {
-    showToast('请填写用户名');
-    return false;
+  if (registerType.value === 'account') {
+    if (!formData.value.userAccount) {
+      showToast('请填写用户名');
+      return false;
+    }
+    if (formData.value.userAccount.length < 4) {
+      showToast('用户名至少 4 位');
+      return false;
+    }
   }
 
-  if (registerType.value === 'phone' && !formData.value.userPhone) {
-    showToast('请填写手机号');
-    return false;
+  if (registerType.value === 'phone') {
+    if (!formData.value.userPhone) {
+      showToast('请填写手机号');
+      return false;
+    }
+    if (!/^1[3-9]\d{9}$/.test(formData.value.userPhone)) {
+      showToast('手机号格式不正确');
+      return false;
+    }
   }
 
   if (!formData.value.password || !formData.value.confirmPassword) {
     showToast('请填写密码');
+    return false;
+  }
+
+  if (
+    formData.value.password.length < 8 ||
+    formData.value.confirmPassword.length < 8
+  ) {
+    showToast('密码至少 8 位');
     return false;
   }
 
@@ -157,10 +187,8 @@ const handleRegister = async () => {
       showToast({
         type: 'success',
         message: '注册成功',
-        onClose: () => {
-          router.push('/login');
-        },
       });
+      await router.replace('/login');
     } else {
       showToast({
         type: 'fail',
@@ -170,7 +198,7 @@ const handleRegister = async () => {
   } catch (error) {
     showToast({
       type: 'fail',
-      message: error.message || '注册失败，请检查网络连接',
+      message: getRegisterErrorMessage(error),
     });
   } finally {
     loading.value = false;
